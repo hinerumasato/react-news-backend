@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { configDotenv } from "dotenv";
-import rssService from "./rssService";
+import rssService from "@/services/rssService";
 
 class RssController {
     constructor() {

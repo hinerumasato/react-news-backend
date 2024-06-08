@@ -14,7 +14,6 @@ class RssService {
             if(!rss.includes("<title>404 - File or directory not found.</title>")) {
                 const parser = new Parser();
                 const json = await parser.parseString(rss);
-                await redisClient.set(url, JSON.stringify(json));
                 return json;
             } else {
                 return "";
