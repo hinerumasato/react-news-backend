@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { configDotenv } from "dotenv";
 import rssService from "@/services/rssService";
+import { RssItem } from "@/interfaces/RssItem";
 
 class RssController {
     constructor() {
@@ -10,24 +11,19 @@ class RssController {
     public async getRss(req: Request, res: Response) {
         const proxy = process.env.RSS_PROXY_URL;
         const url = `${proxy}${req.path}`;
-        const json = await rssService.getRssFeed(url);
+        const feed = await rssService.getRssFeed(url);
         res.contentType("application/json");
-        if(json === "")
+        if(feed === "")
             res.status(404).json({ error: "RSS feed not found" });
         else {
-            const returnJson = this.dataHandler(json as string);
+            const data = feed as RssItem;
+            
             res.status(200).json({
                 statusCode: 200,
                 message: "RSS feed fetched successfully",
-                data: returnJson
+                data: data.items
             })
         };
-    }
-
-    private dataHandler(json: string): string {
-        const prevHandle = JSON.parse(json);
-        const data = prevHandle.items;
-        return data;
     }
 }
 
