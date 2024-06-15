@@ -13,10 +13,10 @@ class RssController {
         const json = await rssService.getRssFeed(url);
         res.contentType("application/json");
         if(json === "")
-            res.status(404).send({error: "RSS feed not found"});
+            res.status(404).json({ error: "RSS feed not found" });
         else {
             const returnJson = this.dataHandler(json as string);
-            res.status(200).send({
+            res.status(200).json({
                 statusCode: 200,
                 message: "RSS feed fetched successfully",
                 data: returnJson
