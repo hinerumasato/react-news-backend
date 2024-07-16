@@ -11,19 +11,49 @@ class RssController {
     public async getRss(req: Request, res: Response) {
         const proxy = process.env.RSS_PROXY_URL;
         const url = `${proxy}${req.path}`;
-        const feed = await rssService.getRssFeed(url);
-        res.contentType("application/json");
-        if (feed === "")
-            res.status(404).json({ error: "RSS feed not found" });
-        else {
-            const data = feed as RssItem;
+        try {
+            const feed = await rssService.getRssFeed(url);
+            res.contentType("application/json");
+            if (feed === "")
+                res.status(404).json({ error: "RSS feed not found" });
+            else {
+                const data = feed as RssItem;
 
-            res.status(200).json({
-                statusCode: 200,
-                message: "RSS feed fetched successfully",
-                data: data.items
-            })
-        };
+                res.status(200).json({
+                    statusCode: 200,
+                    message: "RSS feed fetched successfully",
+                    data: data.items
+                })
+            };
+        }
+        catch (error) {
+            console.log('CATCH STATEMENT ENTERED');
+            let retryCount = 0;
+            const maxRetries = 3;
+            while (retryCount < maxRetries) {
+                try {
+                    const feed = await rssService.getRssFeed(url);
+                    res.contentType("application/json");
+                    if (feed === "")
+                        res.status(404).json({ error: "RSS feed not found" });
+                    else {
+                        const data = feed as RssItem;
+
+                        res.status(200).json({
+                            statusCode: 200,
+                            message: "RSS feed fetched successfully",
+                            data: data.items
+                        });
+                        break;
+                    }
+                } catch (error) {
+                    retryCount++;
+                }
+            }
+            if (retryCount === maxRetries) {
+                res.status(500).json({ error: "Failed to fetch RSS feed" });
+            }
+        }
     }
 }
 

@@ -3,7 +3,7 @@ import { configDotenv } from "dotenv";
 const textToSpeech = require('@google-cloud/text-to-speech');
 
 const client = new textToSpeech.TextToSpeechClient({
-    keyFilename: "<path to key.json>"
+    keyFilename: './src/ttsKey.json'
 });
 
 class TtsController {
